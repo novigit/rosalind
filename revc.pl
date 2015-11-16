@@ -15,6 +15,7 @@ while (my $line = <FILE>){
     chomp $line; # remove newline character from $line
     $dna .= uc($line); # $dna should be all uppercase characters
 }
+close FILE;
 
 # reverse complement dna
 # first complement
