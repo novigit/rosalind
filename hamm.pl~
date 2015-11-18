@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+use strictures;
+
+# open file
+my ($file) = @ARGV;
