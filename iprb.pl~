@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+use strictures;
+
+# open file
+my ($file) = @ARGV;
+open FILE, '<', $file;
+
+# load parameters k, m and n
+my ($k,$m,$n) = split ' ', <FILE>;
+
+# compute population size p
+my $p = $k + $m + $n;
+
+# state all possible genotypes
+my @genotypes = ('AA', 'aA', 'aa');
+
+# store probabilities of presence of dominant allele
+# per genotype combination
+my %pr_dom = (
+    'AAAA' => 1,
+    'AAaA' => 1,
+    'AAaa' => 1,
+    'aAAA' => 1,
+    'aAaA' => 0.75,
+    'aAaa' => 0.5,
+    'aaAA' => 1,
+    'aaaA' => 0.5,
+    'aaaa' => 0
+    );
+
+# set sum of all probabilities of presence dominant allele
+my $pr_sum = 0;
+
+# loop over all genotype combinations
+foreach my $male (@genotypes) {
+    foreach my $female (@genotypes) {
+
+	# set number of individuals per genotype 
+	my $x;
+	$x  = $k if ($male eq 'AA');
+	$x  = $m if ($male eq 'aA');
+	$x  = $n if ($male eq 'aa');
+	
+	# calculate probability of presence dominant allele
+	# in this male-female combination
+	my $pr;
+	# if genotypes are different,
+	# number of females with genotype does not decrease
+	if ($male ne $female) {
+	    $pr = ( $x/$p ) * ( $x/($p-1) ) * $pr_dom{$male . $female};
+	}
+	# if genotypes are the same,
+	# number of females with genotype decrease by 1
+	else {
+	    $pr = ( $x/$p ) * ( ($x-1)/($p-1) ) * $pr_dom{$male . $female};
+	}
+	
+	# add probability to sum of all probabilities
+	$pr_sum += $pr;
+	print $male, "\t", $female, "\t", $pr, "\n";
+    }
+}
+
+# report final sum of probabilities of presence dominante allele
+print $pr_sum, "\n";
