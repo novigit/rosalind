@@ -1,6 +1,9 @@
 #!/usr/bin/perl
 use strictures;
 
+# note, this is a brute force script
+# it is possible to come up with a simpler formula
+
 # open file
 my ($file) = @ARGV;
 open FILE, '<', $file;
@@ -32,32 +35,39 @@ my %pr_dom = (
 my $pr_sum = 0;
 
 # loop over all genotype combinations
-foreach my $male (@genotypes) {
-    foreach my $female (@genotypes) {
+foreach my $gt1 (@genotypes) {
 
-	# set number of individuals per genotype 
+    # set number of individuals y with genotype 1
+    my $y;
+    $y  = $k if ($gt1 eq 'AA');
+    $y  = $m if ($gt1 eq 'aA');
+    $y  = $n if ($gt1 eq 'aa');
+
+    foreach my $gt2 (@genotypes) {
+
+	# set number of individuals x with genotype 2 
 	my $x;
-	$x  = $k if ($male eq 'AA');
-	$x  = $m if ($male eq 'aA');
-	$x  = $n if ($male eq 'aa');
-	
-	# calculate probability of presence dominant allele
-	# in this male-female combination
+	$x  = $k if ($gt2 eq 'AA');
+	$x  = $m if ($gt2 eq 'aA');
+	$x  = $n if ($gt2 eq 'aa');
+
+	# calculate probability pr of presence dominant allele
+	# in offspring of this genotype1-genotype2 combination
 	my $pr;
-	# if genotypes are different,
-	# number of females with genotype does not decrease
-	if ($male ne $female) {
-	    $pr = ( $x/$p ) * ( $x/($p-1) ) * $pr_dom{$male . $female};
+
+	# if genotype1 equals genotype2,
+	# population with genotype2 decrease by 1
+	if    ($gt1 eq $gt2) {
+	    $pr = ( $y/$p ) * ( ($x-1)/($p-1) ) * $pr_dom{$gt1 . $gt2};
 	}
-	# if genotypes are the same,
-	# number of females with genotype decrease by 1
-	else {
-	    $pr = ( $x/$p ) * ( ($x-1)/($p-1) ) * $pr_dom{$male . $female};
+	# if genotype1 is not equal to genotype 2
+	# population with genotype 2 is not affected
+	elsif ($gt1 ne $gt2) {
+	    $pr = ( $y/$p ) * ( $x/($p-1) ) * $pr_dom{$gt1 . $gt2};
 	}
 	
 	# add probability to sum of all probabilities
 	$pr_sum += $pr;
-	print $male, "\t", $female, "\t", $pr, "\n";
     }
 }
 

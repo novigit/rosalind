@@ -14,6 +14,8 @@ my ($k,$m,$n) = split ' ', <FILE>;
 # compute population size p
 my $p = $k + $m + $n;
 
+
+##### The brute force code #####
 # state all possible genotypes
 my @genotypes = ('AA', 'aA', 'aa');
 
@@ -72,4 +74,9 @@ foreach my $gt1 (@genotypes) {
 }
 
 # report final sum of probabilities of presence dominante allele
+print $pr_sum, "\n";
+
+
+##### The elegant code (after solving the equation) #####
+$pr_sum = 1 - ( .25*$m*($m-1) + $m*$n + $n*($n-1) ) / ($p*($p - 1));
 print $pr_sum, "\n";
